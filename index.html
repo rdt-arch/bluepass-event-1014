@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>삼성 AI 구독 블루패스 - 해시태그 복사</title>
+<style>
+  :root {
+    --bg: #f4f6fb;
+    --card: #ffffff;
+    --text: #111827;
+    --sub: #4b5563;
+    --blue: #1428a0;
+    --blue-hover: #0f1e7a;
+    --tag-bg: #eef1fb;
+    --border: #e5e7eb;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1220;
+      --card: #181c2f;
+      --text: #f3f4f6;
+      --sub: #aab0c0;
+      --blue: #4d63e0;
+      --blue-hover: #6b7ef0;
+      --tag-bg: #232842;
+      --border: #2a3050;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+  .wrap { width: 100%; max-width: 560px; }
+  header { text-align: center; margin-bottom: 28px; }
+  header h1 {
+    font-size: 22px;
+    line-height: 1.45;
+    margin: 0 0 8px;
+    word-break: keep-all;
+  }
+  header p {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--blue);
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .tags {
+    background: var(--tag-bg);
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--sub);
+    word-break: break-all;
+    margin-bottom: 14px;
+  }
+  button.copy {
+    width: 100%;
+    border: none;
+    border-radius: 12px;
+    background: var(--blue);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 16px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background .15s, transform .05s;
+  }
+  button.copy:hover { background: var(--blue-hover); }
+  button.copy:active { transform: scale(.98); }
+  button.copy.done { background: #16a34a; }
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 40px;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(17,24,39,.92);
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 999px;
+    font-size: 14px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s, transform .2s;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>삼성 AI 구독만의 특별한 서비스, 블루패스</h1>
+    <p>&lt;영상 공유 이벤트&gt;</p>
+  </header>
+
+  <section class="card">
+    <div class="tags" id="tags1">#삼성AI신혼가전 #삼성AI구독 #혼수가전 #블루패스 #삼성AI구독이신혼을지킨다 #AI가전 #구독에블루패스를더하다 #Samsung #Samsungkorea #삼성 #삼성전자 #삼성전자이벤트</div>
+    <button class="copy" data-target="tags1">인스타그램 외 SNS 필수 해시태그 복사하기</button>
+  </section>
+
+  <section class="card">
+    <div class="tags" id="tags2">#삼성AI신혼가전 #삼성AI구독 #혼수가전 #블루패스 #삼성전자이벤트</div>
+    <button class="copy" data-target="tags2">인스타그램 필수 해시태그 복사하기</button>
+  </section>
+</div>
+
+<div class="toast" id="toast">해시태그가 복사되었습니다!</div>
+
+<script>
+  const toast = document.getElementById('toast');
+  let toastTimer;
+
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
+  }
+
+  async function copyText(text) {
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    } catch (e) {}
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  document.querySelectorAll('button.copy').forEach(btn => {
+    const original = btn.textContent;
+    btn.addEventListener('click', async () => {
+      const text = document.getElementById(btn.dataset.target).textContent.trim();
+      const ok = await copyText(text);
+      if (ok) {
+        btn.classList.add('done');
+        btn.textContent = '복사 완료!';
+        showToast('해시태그가 복사되었습니다!');
+        setTimeout(() => {
+          btn.classList.remove('done');
+          btn.textContent = original;
+        }, 1800);
+      } else {
+        showToast('복사에 실패했습니다. 직접 선택해서 복사해주세요.');
+      }
+    });
+  });
+</script>
+</body>
+</html>
